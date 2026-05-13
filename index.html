@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주간 업무계획(보고) 시스템</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0ede6; --ink: #1c1c1e; --ink-soft: #6e6e73;
+  --accent: #1d3557; --accent2: #457b9d;
+  --border: #c8c0b0; --border-dark: #8a8070; --red: #c0392b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); min-height: 100vh; color: var(--ink); }
+
+/* APP BAR */
+#appbar {
+  background: var(--accent); color: white; padding: 0 32px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+}
+.appbar-left { display: flex; align-items: center; gap: 14px; }
+.appbar-title { font-size: 15px; font-weight: 700; letter-spacing: 0.06em; }
+.db-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px;
+  border-radius: 20px; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85);
+  display: flex; align-items: center; gap: 6px;
+}
+.db-dot { width: 7px; height: 7px; border-radius: 50%; background: #888; transition: all 0.3s; }
+.db-dot.on { background: #4ade80; box-shadow: 0 0 7px #4ade80; }
+.appbar-nav { display: flex; gap: 6px; }
+.ab-btn {
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); color: white;
+  padding: 7px 16px; font-family: 'Noto Sans KR', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; border-radius: 3px; transition: background 0.15s; letter-spacing: 0.04em;
+}
+.ab-btn:hover { background: rgba(255,255,255,0.22); }
+.ab-btn.prim { background: white; color: var(--accent); border-color: white; }
+.ab-btn.prim:hover { background: #eef; }
+
+.view { display: none; } .view.active { display: block; }
+
+/* SETUP */
+#view-setup { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 56px); padding: 32px; }
+.setup-card { background: white; border: 1px solid var(--border); box-shadow: 0 8px 40px rgba(0,0,0,0.12); padding: 44px 48px; max-width: 580px; width: 100%; }
+.setup-icon { font-size: 36px; margin-bottom: 14px; }
+.setup-title { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+.setup-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.85; margin-bottom: 24px; }
+.step-box {
+  background: #f4f8fc; border-left: 3px solid var(--accent2);
+  padding: 13px 16px; margin-bottom: 16px; font-size: 13px; line-height: 1.9;
+}
+.step-box strong { color: var(--accent); }
+.step-box code { background: #dde8f5; padding: 1px 6px; border-radius: 3px; font-family: monospace; font-size: 12px; color: var(--accent); }
+.step-box a { color: var(--accent2); }
+.cfg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0 24px; }
+.sf { display: flex; flex-direction: column; gap: 5px; }
+.sf label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+.sf input {
+  border: 1px solid var(--border); padding: 9px 11px;
+  font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: var(--ink);
+  outline: none; transition: border-color 0.15s; background: #faf8f4;
+}
+.sf input:focus { border-color: var(--accent2); background: white; }
+.btn-connect {
+  width: 100%; padding: 14px; background: var(--accent); color: white; border: none;
+  font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.06em; transition: background 0.18s;
+}
+.btn-connect:hover:not(:disabled) { background: var(--accent2); }
+.btn-connect:disabled { opacity: 0.7; cursor: not-allowed; }
+.err-msg { color: var(--red); font-size: 12px; margin-top: 10px; display: none; }
+
+/* LIST */
+#view-list { padding: 32px; max-width: 900px; margin: 0 auto; }
+.list-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.list-hd h2 { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 700; color: var(--accent); display: inline-block; }
+.list-hd span { font-size: 13px; color: var(--ink-soft); margin-left: 10px; }
+.list-table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 16px rgba(0,0,0,0.07); }
+.list-table th { background: var(--accent); color: white; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; padding: 11px 16px; text-align: left; border: 1px solid rgba(255,255,255,0.1); }
+.list-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid #e8e4dc; vertical-align: middle; }
+.list-table tbody tr:hover td { background: #f5f2ec; cursor: pointer; }
+.dept-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 2px; background: #e8f0f8; color: var(--accent); display: inline-block; margin: 2px; }
+.center-row td { text-align: center; padding: 44px; color: var(--ink-soft); font-size: 14px; }
+
+/* EDIT */
+#view-edit { padding: 28px 32px; max-width: 960px; margin: 0 auto; }
+.edit-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.edit-hd-title { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 700; color: var(--accent); flex: 1; }
+.form-card { background: white; border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(0,0,0,0.07); padding: 28px 32px 32px; margin-bottom: 20px; }
+.form-card-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent2); margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1.5px solid #d8e8f0; }
+.meta-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.fg { display: flex; flex-direction: column; gap: 6px; }
+.fg label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+.fg input { border: 1px solid var(--border); padding: 9px 11px; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: var(--ink); outline: none; transition: border-color 0.15s; background: #faf8f4; }
+.fg input:focus { border-color: var(--accent2); background: white; }
+.sections-wrap { display: flex; flex-direction: column; gap: 12px; }
+.section-block { background: white; border: 1px solid var(--border); box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+.section-header { display: flex; align-items: center; background: #f0f4f8; border-bottom: 1px solid var(--border); padding: 10px 14px; gap: 10px; }
+.section-name-input { flex: 1; border: none; background: transparent; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700; color: var(--accent); outline: none; letter-spacing: 0.04em; }
+.section-name-input::placeholder { color: #aab; font-weight: 400; }
+.btn-del-sec { background: none; border: none; color: #bbb; font-size: 16px; cursor: pointer; padding: 2px 6px; transition: color 0.15s; }
+.btn-del-sec:hover { color: var(--red); }
+.tasks-list { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.task-block { border: 1px solid #e0dbd0; padding: 12px 14px; background: #fdfcf9; }
+.task-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.task-bullet { color: var(--accent); font-size: 15px; margin-top: 7px; flex-shrink: 0; }
+.task-title-input { flex: 1; border: none; border-bottom: 1.5px solid #e0dbd0; background: transparent; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink); outline: none; padding: 6px 0; transition: border-color 0.15s; min-width: 0; }
+.task-title-input:focus { border-bottom-color: var(--accent2); }
+.btn-del-task { background: none; border: none; cursor: pointer; color: #ccc; font-size: 14px; padding: 2px 4px; transition: color 0.15s; flex-shrink: 0; margin-top: 4px; }
+.btn-del-task:hover { color: var(--red); }
+.details-list { padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.detail-row { display: flex; align-items: center; gap: 6px; }
+.detail-dash { color: var(--ink-soft); font-size: 13px; flex-shrink: 0; }
+.detail-input { flex: 1; border: none; border-bottom: 1px dashed #d8d0c0; background: transparent; font-family: 'Noto Sans KR', sans-serif; font-size: 12px; color: rgba(28,28,30,0.75); outline: none; padding: 4px 0; transition: border-color 0.15s; }
+.detail-input:focus { border-bottom-color: var(--accent2); }
+.btn-del-det { background: none; border: none; cursor: pointer; color: #ddd; font-size: 12px; padding: 2px; transition: color 0.15s; }
+.btn-del-det:hover { color: var(--red); }
+.btn-add-task { background: none; border: 1px dashed #d0c8b8; width: 100%; padding: 8px; font-family: 'Noto Sans KR', sans-serif; font-size: 12px; color: var(--ink-soft); cursor: pointer; transition: all 0.15s; margin-top: 4px; }
+.btn-add-task:hover { border-color: var(--accent2); color: var(--accent2); }
+.btn-add-sec { background: none; border: 2px dashed #c8c0b0; width: 100%; padding: 13px; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all 0.18s; letter-spacing: 0.04em; }
+.btn-add-sec:hover { border-color: var(--accent); color: var(--accent); background: rgba(29,53,87,0.03); }
+
+/* PREVIEW */
+#view-preview { padding: 32px; }
+.preview-wrap { max-width: 860px; margin: 0 auto; }
+.preview-controls { display: flex; gap: 8px; margin-bottom: 20px; }
+.doc { background: white; border: 1px solid #bbb; padding: 40px 44px; box-shadow: 0 4px 32px rgba(0,0,0,0.12); }
+.doc-title { text-align: center; font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.doc-meta-row { display: flex; justify-content: space-between; font-size: 12px; color: #444; margin-bottom: 14px; }
+.doc-org { font-weight: 700; font-size: 13px; letter-spacing: 0.1em; }
+.doc-table { width: 100%; border-collapse: collapse; border: 1.5px solid #333; }
+.doc-table th, .doc-table td { border: 1px solid #555; vertical-align: top; padding: 0; }
+.doc-table thead th { text-align: center; font-size: 13px; font-weight: 700; padding: 8px 4px; background: #f0f0f0; letter-spacing: 0.08em; }
+.col-div { width: 72px; }
+.cell-div { text-align: center; font-size: 13px; font-weight: 700; padding: 8px 4px; background: #fafafa; }
+.cell-tasks { padding: 10px 14px; }
+.doc-task-item { margin-bottom: 10px; }
+.doc-task-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; display: flex; gap: 4px; }
+.doc-task-details { padding-left: 16px; }
+.doc-task-detail { font-size: 12px; color: #333; line-height: 1.7; display: flex; gap: 4px; }
+.doc-task-detail::before { content: '-'; flex-shrink: 0; }
+
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #1c1c1e; color: white; padding: 12px 24px; font-size: 13px; border-radius: 4px; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.toast.show { opacity: 1; }
+
+@media print {
+  #appbar, .preview-controls { display: none !important; }
+  #view-preview { display: block !important; padding: 0; }
+  .doc { box-shadow: none; border: none; padding: 20px; }
+  body { background: white; }
+}
+</style>
+</head>
+<body>
+
+<div id="appbar">
+  <div class="appbar-left">
+    <div class="appbar-title">📋 주간 업무계획(보고) 시스템</div>
+    <div class="db-badge"><div class="db-dot" id="db-dot"></div><span id="db-label">미연결</span></div>
+  </div>
+  <div class="appbar-nav">
+    <button class="ab-btn" id="nav-list" style="display:none" onclick="showView('list')">목록</button>
+    <button class="ab-btn prim" id="nav-new" style="display:none" onclick="newDoc()">＋ 새 문서</button>
+    <button class="ab-btn" id="nav-cfg" style="display:none" onclick="showView('setup')">⚙ 설정</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="view active" id="view-setup">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:32px;">
+    <div class="setup-card">
+      <div class="setup-icon">🔥</div>
+      <div class="setup-title">Firebase 데이터베이스 연결</div>
+      <div class="setup-desc">
+        부서원 전체가 같은 데이터를 공유하려면 Firebase를 연결해야 합니다.<br>
+        최초 1회만 설정하면 이후엔 자동으로 연결됩니다.
+      </div>
+
+      <div class="step-box">
+        <strong>① Firebase 프로젝트 생성</strong><br>
+        <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> →
+        <code>프로젝트 추가</code> → 이름 입력 → 생성 완료
+      </div>
+      <div class="step-box">
+        <strong>② Firestore 데이터베이스 활성화</strong><br>
+        좌측 메뉴 <code>Firestore Database</code> → <code>데이터베이스 만들기</code> →
+        <code>테스트 모드</code> → 리전 <code>asia-northeast3(서울)</code> → 완료
+      </div>
+      <div class="step-box">
+        <strong>③ 웹 앱 등록 후 설정값 입력</strong><br>
+        프로젝트 설정 <code>⚙</code> → <code>내 앱</code> → 웹 아이콘 <code>&lt;/&gt;</code> →
+        앱 등록 → <code>firebaseConfig</code> 값을 아래에 붙여넣기
+      </div>
+
+      <div class="cfg-grid">
+        <div class="sf" style="grid-column:1/-1"><label>API Key</label><input id="c-apiKey" placeholder="AIzaSy..."></div>
+        <div class="sf"><label>Auth Domain</label><input id="c-authDomain" placeholder="xxx.firebaseapp.com"></div>
+        <div class="sf"><label>Project ID</label><input id="c-projectId" placeholder="my-project-id"></div>
+        <div class="sf"><label>Storage Bucket</label><input id="c-storageBucket" placeholder="xxx.appspot.com"></div>
+        <div class="sf"><label>Messaging Sender ID</label><input id="c-messagingSenderId" placeholder="123456789"></div>
+        <div class="sf" style="grid-column:1/-1"><label>App ID</label><input id="c-appId" placeholder="1:123:web:abc"></div>
+      </div>
+
+      <button class="btn-connect" id="btn-connect" onclick="connectFirebase()">🔗 Firebase 연결하기</button>
+      <div class="err-msg" id="err-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LIST -->
+<div class="view" id="view-list">
+  <div style="padding:32px;max-width:900px;margin:0 auto;">
+    <div class="list-hd">
+      <div><h2>업무계획 목록</h2><span id="list-count">0건</span></div>
+      <button class="ab-btn prim" style="background:var(--accent);color:white;border-color:var(--accent);" onclick="newDoc()">＋ 새 문서 작성</button>
+    </div>
+    <table class="list-table">
+      <thead><tr>
+        <th style="width:36%">제목</th><th style="width:18%">기간</th>
+        <th style="width:16%">기관명</th><th style="width:20%">구분(부서)</th><th style="width:10%">작성일</th>
+      </tr></thead>
+      <tbody id="list-tbody"><tr class="center-row"><td colspan="5">⏳ 불러오는 중...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- EDIT -->
+<div class="view" id="view-edit">
+  <div style="padding:28px 32px;max-width:960px;margin:0 auto;">
+    <div class="edit-hd">
+      <div class="edit-hd-title" id="edit-heading">새 업무계획 작성</div>
+      <button class="ab-btn" onclick="showView('list')">← 목록</button>
+      <button class="ab-btn" onclick="previewDoc()">미리보기</button>
+      <button class="ab-btn prim" id="btn-save" onclick="saveDoc()">저장</button>
+    </div>
+    <input type="hidden" id="edit-id">
+
+    <div class="form-card">
+      <div class="form-card-title">📌 기본 정보</div>
+      <div class="meta-row">
+        <div class="fg" style="grid-column:1/-1">
+          <label>문서 종류</label>
+          <div style="display:flex;gap:10px;margin-top:4px;">
+            <button type="button" id="btn-tw" onclick="selTitle('주간업무계획(보고)')"
+              style="flex:1;padding:11px 0;border:2px solid var(--accent);background:var(--accent);color:white;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;">주간업무계획(보고)</button>
+            <button type="button" id="btn-td" onclick="selTitle('일일업무계획')"
+              style="flex:1;padding:11px 0;border:2px solid var(--border-dark);background:white;color:var(--ink-soft);font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;">일일업무계획</button>
+          </div>
+          <input type="hidden" id="f-title" value="주간업무계획(보고)">
+        </div>
+        <div class="fg"><label>기간 시작</label><input type="date" id="f-from"></div>
+        <div class="fg"><label>기간 종료</label><input type="date" id="f-to"></div>
+        <div class="fg"><label>기관명</label><input type="text" id="f-org" placeholder="예) 총 부 국"></div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-title">📝 구분별 업무 입력</div>
+      <div class="sections-wrap" id="sw"></div>
+      <button class="btn-add-sec" style="margin-top:14px;" onclick="addSec()">＋ 구분(부서) 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW -->
+<div class="view" id="view-preview">
+  <div class="preview-wrap">
+    <div class="preview-controls">
+      <button class="ab-btn" onclick="goEdit()">← 편집으로</button>
+      <button class="ab-btn prim" onclick="saveDoc()">저장</button>
+      <button class="ab-btn" style="background:var(--accent);color:white;border-color:var(--accent);" onclick="window.print()">🖨 인쇄</button>
+    </div>
+    <div class="doc" id="doc-out"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const COL = 'workplans';
+let db = null, allDocs = [], curId = null, sc = 0, tc = 0;
+
+// ─ expose to HTML onclick ─────────────────────────────────────────
+const G = window;
+G.connectFirebase = connectFirebase;
+G.showView = showView;
+G.newDoc = newDoc;
+G.openDoc = openDoc;
+G.saveDoc = saveDoc;
+G.previewDoc = previewDoc;
+G.goEdit = goEdit;
+G.selTitle = selTitle;
+G.addSec = addSec;
+G.addTask = addTask;
+G.addDetail = addDetail;
+G.handleTitleEnter = handleTitleEnter;
+G.handleDetailEnter = handleDetailEnter;
+
+// ─ auto-connect ───────────────────────────────────────────────────
+(async () => {
+  const cfg = getSaved();
+  if (!cfg) return;
+  fillInputs(cfg);
+  await tryConnect(cfg);
+})();
+
+function getSaved() {
+  try { return JSON.parse(localStorage.getItem('fb_cfg') || 'null'); } catch { return null; }
+}
+function fillInputs(c) {
+  ['apiKey','authDomain','projectId','storageBucket','messagingSenderId','appId']
+    .forEach(k => { const el = document.getElementById('c-' + k); if (el) el.value = c[k] || ''; });
+}
+
+async function tryConnect(cfg) {
+  try {
+    const app = getApps().length ? getApps()[0] : initializeApp(cfg);
+    db = getFirestore(app);
+    await getDocs(query(collection(db, COL)));
+    setOnline(true);
+    showViewRaw('list');
+    await loadDocs();
+    return true;
+  } catch { return false; }
+}
+
+// ─ connect button ─────────────────────────────────────────────────
+async function connectFirebase() {
+  const btn = document.getElementById('btn-connect');
+  const err = document.getElementById('err-msg');
+  err.style.display = 'none';
+  const cfg = {
+    apiKey:            v('c-apiKey'),
+    authDomain:        v('c-authDomain'),
+    projectId:         v('c-projectId'),
+    storageBucket:     v('c-storageBucket'),
+    messagingSenderId: v('c-messagingSenderId'),
+    appId:             v('c-appId'),
+  };
+  if (!cfg.apiKey || !cfg.projectId) { showErr('API Key와 Project ID는 필수입니다.'); return; }
+  btn.innerHTML = '<span class="spinner"></span> 연결 중...';
+  btn.disabled = true;
+  const ok = await tryConnect(cfg);
+  if (ok) {
+    localStorage.setItem('fb_cfg', JSON.stringify(cfg));
+    showToast('Firebase 연결 성공! 🎉');
+  } else {
+    showErr('연결에 실패했습니다. 설정값을 다시 확인해 주세요.');
+    btn.innerHTML = '🔗 Firebase 연결하기';
+    btn.disabled = false;
+  }
+}
+
+function setOnline(on) {
+  document.getElementById('db-dot').className = 'db-dot' + (on ? ' on' : '');
+  document.getElementById('db-label').textContent = on ? '연결됨' : '미연결';
+  ['nav-list','nav-new','nav-cfg'].forEach(id => document.getElementById(id).style.display = on ? '' : 'none');
+}
+
+// ─ views ──────────────────────────────────────────────────────────
+function showViewRaw(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+}
+async function showView(name) {
+  showViewRaw(name);
+  if (name === 'list') await loadDocs();
+}
+function goEdit() { showViewRaw('edit'); }
+
+// ─ list ───────────────────────────────────────────────────────────
+async function loadDocs() {
+  const tbody = document.getElementById('list-tbody');
+  tbody.innerHTML = '<tr class="center-row"><td colspan="5">⏳ 불러오는 중...</td></tr>';
+  try {
+    const snap = await getDocs(query(collection(db, COL), orderBy('createdAt','desc')));
+    allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderList();
+  } catch(e) {
+    tbody.innerHTML = `<tr class="center-row"><td colspan="5">오류: ${e.message}</td></tr>`;
+  }
+}
+
+function renderList() {
+  const tbody = document.getElementById('list-tbody');
+  document.getElementById('list-count').textContent = allDocs.length + '건';
+  if (!allDocs.length) {
+    tbody.innerHTML = '<tr class="center-row"><td colspan="5">작성된 문서가 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allDocs.map(d => {
+    const tags = (d.sections||[]).map(s=>`<span class="dept-tag">${esc(s.name)}</span>`).join('');
+    const period = d.dateFrom && d.dateTo ? `${d.dateFrom.replace(/-/g,'.')}~${d.dateTo.replace(/-/g,'.')}` : d.dateFrom||'-';
+    const date = d.createdAt ? new Date(d.createdAt).toLocaleDateString('ko-KR') : '-';
+    return `<tr onclick="openDoc('${d.id}')">
+      <td><strong>${esc(d.docTitle||'제목 없음')}</strong></td>
+      <td style="font-size:12px;color:#555">${period}</td>
+      <td>${esc(d.org||'-')}</td>
+      <td>${tags}</td>
+      <td style="font-size:11px;color:#888">${date}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─ new / open ─────────────────────────────────────────────────────
+function newDoc() {
+  curId = null; sc = 0; tc = 0;
+  set('edit-id',''); set('edit-heading','새 업무계획 작성');
+  selTitle('주간업무계획(보고)');
+  set('f-from',''); set('f-to',''); set('f-org','');
+  document.getElementById('sw').innerHTML = '';
+  addSec('총무');
+  showViewRaw('edit');
+}
+
+function openDoc(id) {
+  const d = allDocs.find(x => x.id === id);
+  if (!d) return;
+  curId = id; sc = 0; tc = 0;
+  set('edit-id', id);
+  set('edit-heading', '업무계획 수정');
+  selTitle(d.docTitle || '주간업무계획(보고)');
+  set('f-from', d.dateFrom||''); set('f-to', d.dateTo||''); set('f-org', d.org||'');
+  document.getElementById('sw').innerHTML = '';
+  (d.sections||[]).forEach(s => {
+    const idx = addSec(s.name);
+    (s.tasks||[]).forEach(t => addTask(idx, t.title, t.details||[]));
+  });
+  showViewRaw('edit');
+}
+
+// ─ title selector ────────────────────────────────────────────────
+function selTitle(val) {
+  set('f-title', val);
+  const tw = document.getElementById('btn-tw');
+  const td = document.getElementById('btn-td');
+  if (val === '주간업무계획(보고)') {
+    tw.style.background = 'var(--accent)'; tw.style.color = 'white'; tw.style.borderColor = 'var(--accent)';
+    td.style.background = 'white'; td.style.color = 'var(--ink-soft)'; td.style.borderColor = 'var(--border-dark)';
+  } else {
+    td.style.background = 'var(--accent)'; td.style.color = 'white'; td.style.borderColor = 'var(--accent)';
+    tw.style.background = 'white'; tw.style.color = 'var(--ink-soft)'; tw.style.borderColor = 'var(--border-dark)';
+  }
+}
+
+// ─ section ────────────────────────────────────────────────────────
+function addSec(name = '') {
+  const wrap = document.getElementById('sw');
+  const idx = sc++;
+  const div = document.createElement('div');
+  div.className = 'section-block';
+  div.innerHTML = `
+    <div class="section-header">
+      <input class="section-name-input" type="text" placeholder="구분명 (예: 총무, 재원관리...)" value="${ea(name)}">
+      <button class="btn-del-sec" onclick="this.closest('.section-block').remove()">✕</button>
+    </div>
+    <div class="tasks-list" id="tl-${idx}"></div>
+    <div style="padding:0 14px 12px">
+      <button class="btn-add-task" onclick="addTask(${idx})">○ 업무 항목 추가</button>
+    </div>`;
+  wrap.appendChild(div);
+  return idx;
+}
+
+// ─ task ───────────────────────────────────────────────────────────
+function addTask(si, title = '', details = []) {
+  const list = document.getElementById('tl-' + si);
+  if (!list) return;
+  const tid = tc++;
+  const block = document.createElement('div');
+  block.className = 'task-block';
+  const dHtml = details.length ? details.map(d => dRow(d, tid)).join('') : dRow('', tid);
+  block.innerHTML = `
+    <div class="task-top">
+      <div class="task-bullet">○</div>
+      <input class="task-title-input" type="text" placeholder="업무 제목" value="${ea(title)}" onkeydown="handleTitleEnter(event,${tid})">
+      <button class="btn-del-task" onclick="this.closest('.task-block').remove()">✕</button>
+    </div>
+    <div class="details-list" id="dl-${tid}">${dHtml}</div>`;
+  list.appendChild(block);
+}
+
+function dRow(val, tid) {
+  return `<div class="detail-row">
+    <span class="detail-dash">-</span>
+    <input class="detail-input" type="text" placeholder="세부 내용 입력 후 Enter로 줄 추가" value="${ea(val)}" onkeydown="handleDetailEnter(event,${tid})">
+    <button class="btn-del-det" onclick="this.closest('.detail-row').remove()">✕</button>
+  </div>`;
+}
+
+function addDetail(tid) {
+  const list = document.getElementById('dl-' + tid);
+  if (!list) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = dRow('', tid);
+  list.appendChild(tmp.firstElementChild);
+  list.lastElementChild.querySelector('input').focus();
+}
+
+function handleTitleEnter(e, tid) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const list = document.getElementById('dl-' + tid);
+  const first = list && list.querySelector('.detail-input');
+  if (first) first.focus(); else addDetail(tid);
+}
+
+function handleDetailEnter(e, tid) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const list = document.getElementById('dl-' + tid);
+    const inputs = [...list.querySelectorAll('.detail-input')];
+    const i = inputs.indexOf(e.target);
+    if (i === inputs.length - 1) addDetail(tid); else inputs[i+1].focus();
+  }
+  if (e.key === 'Backspace' && !e.target.value) {
+    e.preventDefault();
+    const list = document.getElementById('dl-' + tid);
+    const inputs = [...list.querySelectorAll('.detail-input')];
+    if (inputs.length <= 1) return;
+    const i = inputs.indexOf(e.target);
+    const focus = inputs[i-1] || inputs[i+1];
+    e.target.closest('.detail-row').remove();
+    if (focus) focus.focus();
+  }
+}
+
+// ─ read form ──────────────────────────────────────────────────────
+function readForm() {
+  const sections = [];
+  document.querySelectorAll('#sw .section-block').forEach(sb => {
+    const name = sb.querySelector('.section-name-input').value.trim();
+    const tasks = [];
+    sb.querySelectorAll('.task-block').forEach(tb => {
+      const title = tb.querySelector('.task-title-input').value.trim();
+      const details = [...tb.querySelectorAll('.detail-input')].map(i => i.value.trim()).filter(Boolean);
+      if (title) tasks.push({ title, details });
+    });
+    if (name || tasks.length) sections.push({ name, tasks });
+  });
+  return {
+    docTitle: v('f-title') || '주간업무계획(보고)',
+    dateFrom: v('f-from'), dateTo: v('f-to'), org: v('f-org'),
+    sections
+  };
+}
+
+// ─ save ───────────────────────────────────────────────────────────
+async function saveDoc() {
+  const btn = document.getElementById('btn-save');
+  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+  const data = readForm();
+  const now = new Date().toISOString();
+  try {
+    if (curId) {
+      await updateDoc(doc(db, COL, curId), { ...data, updatedAt: now });
+      showToast('수정 저장되었습니다.');
+    } else {
+      const ref = await addDoc(collection(db, COL), { ...data, createdAt: now, updatedAt: now });
+      curId = ref.id; set('edit-id', curId);
+      set('edit-heading','업무계획 수정');
+      showToast('저장되었습니다. ✅');
+    }
+  } catch(e) { showToast('저장 실패: ' + e.message); }
+  btn.innerHTML = '저장'; btn.disabled = false;
+}
+
+// ─ preview ────────────────────────────────────────────────────────
+function previewDoc() { renderDoc(readForm()); showViewRaw('preview'); }
+
+function renderDoc(data) {
+  const from = data.dateFrom ? data.dateFrom.replace(/-/g,'.') : '';
+  const to   = data.dateTo   ? data.dateTo.replace(/-/g,'.')   : '';
+  const period = from && to ? `${from}(월)~${to}(금)` : from || '';
+  let rows = '';
+  data.sections.forEach(sec => {
+    const n = sec.tasks.length;
+    if (!n) { rows += `<tr><td class="col-div"><div class="cell-div">${esc(sec.name)}</div></td><td class="cell-tasks"></td></tr>`; return; }
+    sec.tasks.forEach((t, i) => {
+      const dHtml = t.details.length
+        ? `<div class="doc-task-details">${t.details.map(d=>`<div class="doc-task-detail">${esc(d)}</div>`).join('')}</div>` : '';
+      const tHtml = `<div class="doc-task-item"><div class="doc-task-title"><span>○</span><span>${esc(t.title)}</span></div>${dHtml}</div>`;
+      if (i === 0) {
+        rows += `<tr><td class="col-div" rowspan="${n}"><div class="cell-div" style="display:flex;align-items:center;justify-content:center;min-height:${n*60}px">${esc(sec.name)}</div></td><td class="cell-tasks">${tHtml}</td></tr>`;
+      } else {
+        rows += `<tr><td class="cell-tasks">${tHtml}</td></tr>`;
+      }
+    });
+  });
+  document.getElementById('doc-out').innerHTML = `
+    <div class="doc-title">${esc(data.docTitle)}</div>
+    <div class="doc-meta-row"><span>${period}</span><span class="doc-org">${esc(data.org)}</span></div>
+    <table class="doc-table">
+      <colgroup><col class="col-div"><col></colgroup>
+      <thead><tr><th class="col-div">구분</th><th>추 진 업 무</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ─ helpers ────────────────────────────────────────────────────────
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function ea(s)  { return (s||'').replace(/"/g,'&quot;'); }
+function v(id)  { return (document.getElementById(id)||{}).value || ''; }
+function set(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
+function showErr(msg) { const e = document.getElementById('err-msg'); e.textContent = msg; e.style.display = 'block'; }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+</script>
+</body>
+</html>
