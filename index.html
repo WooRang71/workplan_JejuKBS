@@ -306,9 +306,20 @@ G.addSec = addSec; G.addTask = addTask; G.addDetail = addDetail;
 G.handleTitleEnter = handleTitleEnter; G.handleDetailEnter = handleDetailEnter;
 G.livePreview = livePreview;
 
+// ── 미리 설정된 Firebase 설정값 (부서 공용) ──────────────────────
+const PRESET_CFG = {
+  apiKey:            "AIzaSyBB8Zh2i5OfJeXArwtWOG3USLzlX8m8ozY",
+  authDomain:        "jejukbs-officework.firebaseapp.com",
+  projectId:         "jejukbs-officework",
+  storageBucket:     "jejukbs-officework.firebasestorage.app",
+  messagingSenderId: "733204513881",
+  appId:             "1:733204513881:web:b5ab47c644156be51cdd48",
+};
+
 // ── auto-connect ──────────────────────────────────────────────────
 (async () => {
-  const cfg = getSaved(); if (!cfg) return;
+  // 저장된 설정 또는 미리 설정된 값으로 자동 연결
+  const cfg = getSaved() || PRESET_CFG;
   fillCfg(cfg); await tryConnect(cfg);
 })();
 
