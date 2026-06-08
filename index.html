@@ -108,7 +108,12 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
 .btn-del-sec:hover { color: var(--red); }
 
 .tasks-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
-.task-blk { border: 1px solid #eee; border-radius: 4px; padding: 10px 12px; background: #fdfcf9; }
+.task-blk { border: 1px solid #eee; border-radius: 4px; padding: 10px 12px; background: #fdfcf9; position: relative; }
+.task-blk.dragging { opacity: 0.4; border: 2px dashed var(--blue); }
+.task-blk.drag-over { border-top: 3px solid var(--blue); }
+.drag-handle { cursor: grab; color: #ccc; font-size: 16px; padding: 2px 4px; flex-shrink: 0; margin-top: 4px; user-select: none; transition: color .15s; }
+.drag-handle:hover { color: var(--primary); }
+.drag-handle:active { cursor: grabbing; }
 .task-row { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 6px; }
 .task-o { color: var(--primary); font-size: 14px; margin-top: 6px; flex-shrink: 0; }
 .task-inp { flex: 1; border: none; border-bottom: 1.5px solid #e0e0e0; background: transparent; font-family: inherit; font-size: 13px; font-weight: 600; color: #222; outline: none; padding: 5px 0; transition: border-color .15s; min-width: 0; }
@@ -480,9 +485,11 @@ function addTask(si, title = '', note = '', details = []) {
   const tid = tc++;
   const blk = document.createElement('div');
   blk.className = 'task-blk';
+  blk.draggable = true;
   const dHtml = details.length ? details.map(d => dRow(d, tid)).join('') : dRow('', tid);
   blk.innerHTML = `
     <div class="task-row">
+      <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
       <div class="task-o">○</div>
       <input class="task-inp" type="text" placeholder="업무 제목" value="${ea(title)}"
         onkeydown="handleTitleEnter(event,${tid})" oninput="livePreview()">
@@ -490,6 +497,37 @@ function addTask(si, title = '', note = '', details = []) {
       <button class="btn-del-task" onclick="this.closest('.task-blk').remove();livePreview()">✕</button>
     </div>
     <div class="dets" id="dl-${tid}">${dHtml}</div>`;
+
+  // drag events
+  blk.addEventListener('dragstart', e => {
+    e.dataTransfer.effectAllowed = 'move';
+    blk.classList.add('dragging');
+    setTimeout(() => blk.style.opacity = '0.4', 0);
+  });
+  blk.addEventListener('dragend', () => {
+    blk.classList.remove('dragging');
+    blk.style.opacity = '';
+    document.querySelectorAll('.task-blk').forEach(b => b.classList.remove('drag-over'));
+    livePreview();
+  });
+  blk.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const dragging = document.querySelector('.task-blk.dragging');
+    if (!dragging || dragging === blk) return;
+    document.querySelectorAll('.task-blk').forEach(b => b.classList.remove('drag-over'));
+    blk.classList.add('drag-over');
+    const rect = blk.getBoundingClientRect();
+    const mid = rect.top + rect.height / 2;
+    if (e.clientY < mid) {
+      blk.parentNode.insertBefore(dragging, blk);
+    } else {
+      blk.parentNode.insertBefore(dragging, blk.nextSibling);
+    }
+  });
+  blk.addEventListener('dragleave', () => blk.classList.remove('drag-over'));
+  blk.addEventListener('drop', e => { e.preventDefault(); blk.classList.remove('drag-over'); });
+
   list.appendChild(blk);
 }
 
