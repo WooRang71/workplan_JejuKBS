@@ -267,7 +267,14 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
       <div class="meta-grid">
         <div class="fg"><label id="lbl-from">기간 시작</label><input type="date" id="f-from" oninput="livePreview()"></div>
         <div class="fg" id="fg-to"><label>기간 종료</label><input type="date" id="f-to" oninput="livePreview()"></div>
-        <div class="fg full"><label>기관명</label><input type="text" id="f-org" placeholder="예) 총 무 국" oninput="livePreview()"></div>
+        <div class="fg full"><label>기관명</label>
+          <select id="f-org" onchange="livePreview()" style="border:1px solid var(--border);border-radius:4px;padding:8px 10px;font-family:inherit;font-size:13px;color:var(--ink, #1c1c1e);outline:none;background:#faf8f4;cursor:pointer;">
+            <option value="총 무 국">총무국</option>
+            <option value="보 도 국">보도국</option>
+            <option value="편 제 국">편제국</option>
+            <option value="기 술 국">기술국</option>
+          </select>
+        </div>
       </div>
 
       <div class="ed-divider">구분별 업무 입력 <span style="font-size:10px;font-weight:400;color:#aaa;margin-left:6px;text-transform:none;letter-spacing:0;">업무제목 옆 작은 칸 = 비고</span></div>
@@ -428,7 +435,7 @@ function newDoc() {
   curId = null; sc = 0; tc = 0;
   sv('edit-id',''); sv('ed-heading','새 업무계획 작성');
   selTitle('주간업무계획(보고)');
-  sv('f-from',''); sv('f-to',''); sv('f-org',''); sv('f-notice','');
+  sv('f-from',''); sv('f-to',''); sv('f-org','총 무 국'); sv('f-notice','');
   document.getElementById('sw').innerHTML = '';
   addSec('총무');
   addSec('재원관리');
