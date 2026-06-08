@@ -146,23 +146,25 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
 .pv-body { flex: 1; overflow-y: auto; padding: 24px; }
 
 /* document */
-.doc { background: white; padding: 32px 36px; box-shadow: 0 2px 16px rgba(0,0,0,0.1); }
-.doc-title { text-align: center; font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; text-decoration: underline; letter-spacing: 3px; }
-.doc-meta { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: #222; margin-bottom: 10px; }
-.doc-tbl { width: 100%; border-collapse: collapse; border: 1.5px solid #222; font-size: 13px; line-height: 1.7; }
-.doc-tbl th, .doc-tbl td { border: 1px solid #444; vertical-align: top; padding: 0; }
-.doc-tbl thead th { text-align: center; font-weight: 700; padding: 7px 4px; background: #e8e8e8; letter-spacing: .06em; }
-.col-g  { width: 10%; }
-.col-n  { width: 12%; }
-.cell-g { text-align: center; font-weight: 700; font-size: 14px; letter-spacing: 3px; padding: 6px 4px; background: #fafafa; display: flex; align-items: center; justify-content: center; }
+.doc { background: white; padding: 28px 32px; box-shadow: 0 2px 16px rgba(0,0,0,0.1); }
+.doc-title { text-align: center; font-family: 'Noto Serif KR', serif; font-size: 26px; font-weight: 900; margin-bottom: 10px; text-decoration: underline; letter-spacing: 4px; }
+.doc-meta { display: flex; justify-content: space-between; align-items: flex-end; font-size: 13px; font-weight: 600; color: #111; margin-bottom: 8px; }
+.doc-meta-date { font-size: 13px; }
+.doc-meta-org  { font-size: 14px; font-weight: 700; letter-spacing: 6px; }
+.doc-tbl { width: 100%; border-collapse: collapse; border: 1.5px solid #111; font-size: 13px; line-height: 1.75; }
+.doc-tbl th, .doc-tbl td { border: 1px solid #333; vertical-align: top; padding: 0; }
+.doc-tbl thead th { text-align: center; font-weight: 700; padding: 7px 4px; background: #e0e0e0; letter-spacing: .1em; font-size: 13px; }
+.col-g  { width: 9%; }
+.col-n  { width: 11%; }
+.cell-g { text-align: center; font-weight: 700; font-size: 14px; letter-spacing: 2px; padding: 6px 2px; background: #fafafa; display: flex; align-items: center; justify-content: center; word-break: keep-all; line-height: 1.6; }
 .cell-c { padding: 8px 12px; }
-.cell-n { padding: 6px 8px; font-size: 12px; color: #444; vertical-align: middle; text-align: center; white-space: pre-wrap; word-break: keep-all; }
-.doc-task { margin-bottom: 8px; }
-.doc-task-ttl { font-weight: 500; display: flex; gap: 4px; align-items: flex-start; }
-.doc-task-dets { padding-left: 14px; }
-.doc-task-det { color: #333; display: flex; gap: 4px; font-size: 12px; }
+.cell-n { padding: 6px 6px; font-size: 12px; color: #333; vertical-align: middle; text-align: center; white-space: pre-wrap; word-break: keep-all; }
+.doc-task { margin-bottom: 9px; }
+.doc-task-ttl { font-weight: 700; display: flex; gap: 4px; align-items: flex-start; font-size: 13px; }
+.doc-task-dets { padding-left: 16px; }
+.doc-task-det { color: #222; display: flex; gap: 4px; font-size: 13px; line-height: 1.7; }
 .doc-task-det::before { content: '-'; flex-shrink: 0; }
-.notice-cell { padding: 8px 12px; font-size: 13px; white-space: pre-wrap; line-height: 1.8; color: #333; }
+.notice-cell { padding: 8px 12px; font-size: 13px; white-space: pre-wrap; line-height: 1.8; color: #222; }
 
 /* spinner / toast */
 .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; }
@@ -175,8 +177,9 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
   #view-edit { height: auto; flex-direction: column; }
   .ed-right { overflow: visible; }
   .pv-body { overflow: visible; padding: 0; }
-  .doc { box-shadow: none; }
+  .doc { box-shadow: none; margin-top: 20px; }
   body { background: white; }
+  @page { margin-top: 25mm; margin-bottom: 20mm; margin-left: 15mm; margin-right: 15mm; }
 }
 </style>
 </head>
@@ -306,9 +309,20 @@ G.addSec = addSec; G.addTask = addTask; G.addDetail = addDetail;
 G.handleTitleEnter = handleTitleEnter; G.handleDetailEnter = handleDetailEnter;
 G.livePreview = livePreview;
 
+// ── 미리 설정된 Firebase 설정값 (부서 공용) ──────────────────────
+const PRESET_CFG = {
+  apiKey:            "AIzaSyBB8Zh2i5OfJeXArwtWOG3USLzlX8m8ozY",
+  authDomain:        "jejukbs-officework.firebaseapp.com",
+  projectId:         "jejukbs-officework",
+  storageBucket:     "jejukbs-officework.firebasestorage.app",
+  messagingSenderId: "733204513881",
+  appId:             "1:733204513881:web:b5ab47c644156be51cdd48",
+};
+
 // ── auto-connect ──────────────────────────────────────────────────
 (async () => {
-  const cfg = getSaved(); if (!cfg) return;
+  // 저장된 설정 또는 미리 설정된 값으로 자동 연결
+  const cfg = getSaved() || PRESET_CFG;
   fillCfg(cfg); await tryConnect(cfg);
 })();
 
@@ -323,7 +337,10 @@ async function tryConnect(cfg) {
     db = getFirestore(app);
     await getDocs(query(collection(db, COL)));
     setOnline(true); showViewRaw('list'); await loadDocs(); return true;
-  } catch { return false; }
+  } catch(e) {
+    console.error('Firebase 연결 오류:', e);
+    return false;
+  }
 }
 async function connectFirebase() {
   const btn = document.getElementById('btn-conn');
@@ -336,9 +353,26 @@ async function connectFirebase() {
   };
   if (!cfg.apiKey || !cfg.projectId) { showErr('API Key와 Project ID는 필수입니다.'); return; }
   btn.innerHTML = '<span class="spinner"></span> 연결 중...'; btn.disabled = true;
-  const ok = await tryConnect(cfg);
-  if (ok) { localStorage.setItem('fb_cfg', JSON.stringify(cfg)); showToast('Firebase 연결 성공! 🎉'); }
-  else { showErr('연결 실패. 설정값을 다시 확인해 주세요.'); btn.innerHTML = '🔗 Firebase 연결하기'; btn.disabled = false; }
+  try {
+    const app = getApps().length ? getApps()[0] : initializeApp(cfg);
+    db = getFirestore(app);
+    await getDocs(query(collection(db, COL)));
+    localStorage.setItem('fb_cfg', JSON.stringify(cfg));
+    setOnline(true);
+    showToast('Firebase 연결 성공! 🎉');
+    showViewRaw('list');
+    await loadDocs();
+  } catch(e) {
+    console.error('연결 오류 상세:', e);
+    const msg = e.code === 'permission-denied'
+      ? '❌ 권한 오류: Firebase 규칙 탭에서 규칙을 다시 게시해 주세요.'
+      : e.code === 'unavailable'
+      ? '❌ 네트워크 오류: 인터넷 연결을 확인해 주세요.'
+      : `❌ 오류: ${e.message}`;
+    showErr(msg);
+    btn.innerHTML = '🔗 Firebase 연결하기';
+    btn.disabled = false;
+  }
 }
 function setOnline(on) {
   document.getElementById('db-dot').className = 'db-dot'+(on?' on':'');
@@ -392,6 +426,7 @@ function newDoc() {
   sv('f-from',''); sv('f-to',''); sv('f-org',''); sv('f-notice','');
   document.getElementById('sw').innerHTML = '';
   addSec('총무');
+  addSec('재원관리');
   showViewRaw('edit'); livePreview();
 }
 function openDoc(id) {
@@ -572,8 +607,8 @@ function livePreview() {
   document.getElementById('doc-out').innerHTML = `
     <div class="doc-title">${esc(data.docTitle)}</div>
     <div class="doc-meta">
-      <span>${period}</span>
-      <span>${esc(data.org)}</span>
+      <span class="doc-meta-date">${period}</span>
+      <span class="doc-meta-org">${esc(data.org)}</span>
     </div>
     <table class="doc-tbl">
       <colgroup><col class="col-g"><col><col class="col-n"></colgroup>
