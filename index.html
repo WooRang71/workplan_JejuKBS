@@ -809,19 +809,42 @@ function renderTplList() {
 function loadTpl(id) {
   const tpl = getTpls().find(t => t.id === id);
   if (!tpl) return;
-  if (!confirm(`"${tpl.name}" 템플릿을 현재 업무 항목 아래에 추가할까요?`)) return;
+  if (!confirm(`"${tpl.name}" 템플릿을 추가할까요?`)) return;
 
   tpl.sections.forEach(s => {
-    const existingBlocks = [...document.querySelectorAll('#sw .sec-block')];
-    const existing = existingBlocks.find(sb => sb.querySelector('.sec-name').value.trim() === s.name);
+    // 같은 이름 구분 찾기
+    let tasksBody = null;
+    document.querySelectorAll('#sw .sec-block').forEach(sb => {
+      if (sb.querySelector('.sec-name').value.trim() === s.name) {
+        tasksBody = sb.querySelector('.tasks-body');
+      }
+    });
 
-    if (existing) {
-      // 기존 구분의 tasks-body id를 찾아서 addTask에 전달
-      const tasksList = existing.querySelector('.tasks-body');
-      const listId = tasksList.id; // "tl-숫자" 형태
-      const sIdx = parseInt(listId.replace('tl-', ''));
-      s.tasks.forEach(t => addTask(sIdx, t.title, t.note||'', t.details||[]));
+    if (tasksBody) {
+      // 맨 위에 삽입 - 임시 div에 addTask로 생성 후 prepend
+      s.tasks.forEach(t => {
+        const tid = tc++;
+        const dHtml = (t.details||[]).length
+          ? t.details.map(d => dRow(d, tid)).join('')
+          : dRow('', tid);
+        const blk = document.createElement('div');
+        blk.className = 'task-blk';
+        blk.draggable = true;
+        blk.innerHTML = `
+          <div class="task-row">
+            <input type="checkbox" class="task-chk" style="flex-shrink:0;width:15px;height:15px;cursor:pointer;accent-color:var(--primary);margin-top:6px;">
+            <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
+            <div class="task-o">○</div>
+            <input class="task-inp" type="text" value="${ea(t.title)}" onkeydown="handleTitleEnter(event,${tid})" oninput="livePreview()">
+            <input class="task-note-inp" type="text" placeholder="비고" value="${ea(t.note||'')}" oninput="livePreview()">
+            <button class="btn-del-task" onclick="this.closest('.task-blk').remove();livePreview()">✕</button>
+          </div>
+          <div class="dets" id="dl-${tid}">${dHtml}</div>`;
+        addDragEvents(blk);
+        tasksBody.prepend(blk); // 맨 위에 추가
+      });
     } else {
+      // 없는 구분이면 새로 만들어서 추가
       const idx = addSec(s.name);
       s.tasks.forEach(t => addTask(idx, t.title, t.note||'', t.details||[]));
     }
@@ -829,7 +852,7 @@ function loadTpl(id) {
 
   closeTplModal();
   livePreview();
-  showToast(`"${tpl.name}" 템플릿을 추가했습니다.`);
+  showToast(`"${tpl.name}" 템플릿을 추가했습니다. ✅`);
 }
 
 function delTpl(id) {
