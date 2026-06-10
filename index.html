@@ -194,6 +194,8 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
   .pv-body { overflow: visible; padding: 0; }
   .doc { box-shadow: none; margin-top: 20px; }
   body { background: white; }
+  .doc-tbl thead th { background: #e0e0e0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cell-g { background: #fafafa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   @page { margin-top: 25mm; margin-bottom: 20mm; margin-left: 15mm; margin-right: 15mm; }
 }
 </style>
@@ -688,8 +690,9 @@ function livePreview() {
         <td class="notice-cell" colspan="2">${esc(data.notice)}</td>
       </tr>` : '';
 
+  const titleMargin = isWeekly ? '' : 'margin-top:4.5em;';
   document.getElementById('doc-out').innerHTML = `
-    <div class="doc-title">${esc(data.docTitle)}</div>
+    <div class="doc-title" style="${titleMargin}">${esc(data.docTitle)}</div>
     <div class="doc-meta">
       <span class="doc-meta-date">${period}</span>
       <span class="doc-meta-org">${esc(data.org)}</span>
