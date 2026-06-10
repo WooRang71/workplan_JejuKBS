@@ -508,6 +508,7 @@ function addSec(name = '') {
   const idx = sc++;
   const div = document.createElement('div');
   div.className = 'sec-block';
+  div.dataset.idx = idx;
   div.innerHTML = `
     <div class="sec-hd">
       <input class="sec-name" type="text" placeholder="구분명 (예: 총무, 재원관리...)" value="${ea(name)}" oninput="livePreview()">
@@ -811,37 +812,16 @@ function loadTpl(id) {
   if (!confirm(`"${tpl.name}" 템플릿을 현재 업무 항목 아래에 추가할까요?`)) return;
 
   tpl.sections.forEach(s => {
-    // 같은 이름의 구분이 이미 있으면 그 안에 직접 추가
     const existingBlocks = [...document.querySelectorAll('#sw .sec-block')];
     const existing = existingBlocks.find(sb => sb.querySelector('.sec-name').value.trim() === s.name);
 
     if (existing) {
-      // 기존 구분의 tasks-body에 직접 추가
+      // 기존 구분의 tasks-body id를 찾아서 addTask에 전달
       const tasksList = existing.querySelector('.tasks-body');
-      s.tasks.forEach(t => {
-        const tid = tc++;
-        const dHtml = (t.details||[]).length
-          ? t.details.map(d => dRow(d, tid)).join('')
-          : dRow('', tid);
-        const blk = document.createElement('div');
-        blk.className = 'task-blk';
-        blk.draggable = true;
-        blk.innerHTML = `
-          <div class="task-row">
-            <input type="checkbox" class="task-chk" title="템플릿 저장 시 선택" style="flex-shrink:0;width:15px;height:15px;cursor:pointer;accent-color:var(--primary);margin-top:6px;">
-            <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
-            <div class="task-o">○</div>
-            <input class="task-inp" type="text" placeholder="업무 제목" value="${ea(t.title)}"
-              onkeydown="handleTitleEnter(event,${tid})" oninput="livePreview()">
-            <input class="task-note-inp" type="text" placeholder="비고" value="${ea(t.note||'')}" oninput="livePreview()">
-            <button class="btn-del-task" onclick="this.closest('.task-blk').remove();livePreview()">✕</button>
-          </div>
-          <div class="dets" id="dl-${tid}">${dHtml}</div>`;
-        addDragEvents(blk);
-        tasksList.appendChild(blk);
-      });
+      const listId = tasksList.id; // "tl-숫자" 형태
+      const sIdx = parseInt(listId.replace('tl-', ''));
+      s.tasks.forEach(t => addTask(sIdx, t.title, t.note||'', t.details||[]));
     } else {
-      // 없으면 새 구분 생성
       const idx = addSec(s.name);
       s.tasks.forEach(t => addTask(idx, t.title, t.note||'', t.details||[]));
     }
