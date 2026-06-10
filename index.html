@@ -683,14 +683,13 @@ function livePreview() {
     });
   });
 
-  // 공지사항 row
-  const noticeRow = data.notice
-    ? `<tr>
-        <td class="col-g"><div class="cell-g" style="min-height:40px;letter-spacing:1px;font-size:13px;">공지<br>사항</div></td>
-        <td class="notice-cell" colspan="2">${esc(data.notice)}</td>
-      </tr>` : '';
+  // 공지사항 row — 내용 없어도 항상 표시
+  const noticeRow = `<tr>
+    <td class="col-g"><div class="cell-g" style="min-height:48px;letter-spacing:1px;font-size:13px;">공지<br>사항</div></td>
+    <td class="notice-cell" colspan="2">${esc(data.notice)}</td>
+  </tr>`;
 
-  const titleMargin = isWeekly ? '' : 'margin-top:1.5em;';
+  const titleMargin = isWeekly ? '' : '';
   document.getElementById('doc-out').innerHTML = `
     <div class="doc-title" style="${titleMargin}">${esc(data.docTitle)}</div>
     <div class="doc-meta">
