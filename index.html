@@ -531,6 +531,7 @@ function addTask(si, title = '', note = '', details = []) {
   const dHtml = details.length ? details.map(d => dRow(d, tid)).join('') : dRow('', tid);
   blk.innerHTML = `
     <div class="task-row">
+      <input type="checkbox" class="task-chk" title="템플릿 저장 시 선택" style="flex-shrink:0;width:15px;height:15px;cursor:pointer;accent-color:var(--primary);margin-top:6px;">
       <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
       <div class="task-o">○</div>
       <input class="task-inp" type="text" placeholder="업무 제목" value="${ea(title)}"
@@ -737,15 +738,38 @@ function getTpls() { try { return JSON.parse(localStorage.getItem('wp_tpls') || 
 function saveTpls(arr) { localStorage.setItem('wp_tpls', JSON.stringify(arr)); }
 
 function saveTpl() {
-  const data = readForm();
-  if (!data.sections.length || !data.sections.some(s => s.tasks.length)) {
-    showToast('저장할 업무 항목이 없습니다.'); return;
+  // 체크된 항목 확인
+  const checked = document.querySelectorAll('.task-chk:checked');
+  if (!checked.length) {
+    showToast('저장할 업무 항목을 먼저 체크해 주세요. ☑'); return;
   }
   const name = prompt('템플릿 이름을 입력하세요:', '주간 반복 업무');
   if (!name) return;
+
+  // 체크된 항목만 구분별로 수집
+  const sections = [];
+  document.querySelectorAll('#sw .sec-block').forEach(sb => {
+    const secName = sb.querySelector('.sec-name').value.trim();
+    const tasks = [];
+    sb.querySelectorAll('.task-blk').forEach(tb => {
+      const chk = tb.querySelector('.task-chk');
+      if (!chk || !chk.checked) return;
+      const title   = tb.querySelector('.task-inp').value.trim();
+      const note    = tb.querySelector('.task-note-inp').value.trim();
+      const details = [...tb.querySelectorAll('.det-inp')].map(i => i.value.trim()).filter(Boolean);
+      if (title) tasks.push({title, note, details});
+    });
+    if (tasks.length) sections.push({name: secName, tasks});
+  });
+
+  if (!sections.length) { showToast('체크된 항목이 없습니다.'); return; }
+
   const tpls = getTpls();
-  tpls.push({ id: Date.now().toString(), name, sections: data.sections, createdAt: new Date().toLocaleDateString('ko-KR') });
+  tpls.push({ id: Date.now().toString(), name, sections, createdAt: new Date().toLocaleDateString('ko-KR') });
   saveTpls(tpls);
+
+  // 체크 해제
+  checked.forEach(c => c.checked = false);
   showToast(`"${name}" 템플릿이 저장됐습니다. ✅`);
 }
 
