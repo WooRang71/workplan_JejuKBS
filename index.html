@@ -197,7 +197,7 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
   .doc-tbl thead th { background: #e0e0e0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .cell-g { background: #fafafa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
-  @page { size: A4; margin: 12mm 14mm; }
+  @page { size: A4; margin: 18mm 18mm 14mm 18mm; }
 
   /* 기본 (내용 적음) 크기 */
   .doc-title { font-size: 22px; margin-bottom: 8px; }
@@ -936,8 +936,8 @@ function printDoc() {
   doc.classList.remove('print-shrink-1','print-shrink-2','print-shrink-3');
 
   // A4 본문 영역 기준 높이 계산 (mm → px, 96dpi 기준: 1mm ≈ 3.7795px)
-  // A4: 297mm, 여백 12mm*2 = 24mm → 본문 273mm ≈ 1032px
-  const PAGE_HEIGHT_PX = (297 - 24) * 3.7795;
+  // A4: 297mm, 여백 상18+하14 = 32mm → 본문 265mm ≈ 1002px
+  const PAGE_HEIGHT_PX = (297 - 32) * 3.7795;
 
   // 강제 리플로우 후 실제 콘텐츠 높이 측정
   const contentHeight = doc.scrollHeight;
