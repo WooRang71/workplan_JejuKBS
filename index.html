@@ -192,11 +192,71 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
   #view-edit { height: auto; flex-direction: column; }
   .ed-right { overflow: visible; }
   .pv-body { overflow: visible; padding: 0; }
-  .doc { box-shadow: none; margin-top: 20px; }
+  .doc { box-shadow: none; margin-top: 0; padding: 0; }
   body { background: white; }
   .doc-tbl thead th { background: #e0e0e0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .cell-g { background: #fafafa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  @page { margin-top: 25mm; margin-bottom: 20mm; margin-left: 15mm; margin-right: 15mm; }
+
+  @page { size: A4; margin: 12mm 14mm; }
+
+  /* 기본 (내용 적음) 크기 */
+  .doc-title { font-size: 22px; margin-bottom: 8px; }
+  .doc-meta { font-size: 12px; margin-bottom: 8px; }
+  .doc-meta-org { font-size: 13px; letter-spacing: 5px; }
+  .doc-tbl { font-size: 13px; line-height: 1.7; }
+  .doc-tbl thead th { padding: 6px 4px; font-size: 13px; }
+  .cell-c { padding: 7px 12px; }
+  .cell-n { padding: 5px 6px; font-size: 12px; }
+  .cell-g { font-size: 14px; padding: 5px 2px; }
+  .doc-task { margin-bottom: 7px; }
+  .doc-task-ttl { font-size: 13px; }
+  .doc-task-det { font-size: 12px; line-height: 1.65; }
+  .doc-task-dets { padding-left: 15px; }
+  .notice-cell { font-size: 13px; line-height: 1.7; padding: 6px 12px; }
+
+  /* 내용 많음 → 1단계 축소 */
+  .doc.print-shrink-1 .doc-title { font-size: 19px; margin-bottom: 6px; }
+  .doc.print-shrink-1 .doc-meta { font-size: 11px; margin-bottom: 6px; }
+  .doc.print-shrink-1 .doc-meta-org { font-size: 12px; letter-spacing: 4px; }
+  .doc.print-shrink-1 .doc-tbl { font-size: 12px; line-height: 1.55; }
+  .doc.print-shrink-1 .doc-tbl thead th { padding: 5px 4px; font-size: 12px; }
+  .doc.print-shrink-1 .cell-c { padding: 5px 11px; }
+  .doc.print-shrink-1 .cell-n { padding: 4px 5px; font-size: 11px; }
+  .doc.print-shrink-1 .cell-g { font-size: 13px; padding: 4px 2px; }
+  .doc.print-shrink-1 .doc-task { margin-bottom: 5px; }
+  .doc.print-shrink-1 .doc-task-ttl { font-size: 12px; }
+  .doc.print-shrink-1 .doc-task-det { font-size: 11px; line-height: 1.5; }
+  .doc.print-shrink-1 .notice-cell { font-size: 12px; line-height: 1.6; padding: 5px 11px; }
+
+  /* 내용 매우 많음 → 2단계 축소 */
+  .doc.print-shrink-2 .doc-title { font-size: 17px; margin-bottom: 5px; }
+  .doc.print-shrink-2 .doc-meta { font-size: 10px; margin-bottom: 5px; }
+  .doc.print-shrink-2 .doc-meta-org { font-size: 11px; letter-spacing: 3px; }
+  .doc.print-shrink-2 .doc-tbl { font-size: 10.5px; line-height: 1.4; }
+  .doc.print-shrink-2 .doc-tbl thead th { padding: 4px 3px; font-size: 10.5px; }
+  .doc.print-shrink-2 .cell-c { padding: 4px 9px; }
+  .doc.print-shrink-2 .cell-n { padding: 3px 4px; font-size: 10px; }
+  .doc.print-shrink-2 .cell-g { font-size: 11px; padding: 3px 2px; }
+  .doc.print-shrink-2 .doc-task { margin-bottom: 4px; }
+  .doc.print-shrink-2 .doc-task-ttl { font-size: 10.5px; }
+  .doc.print-shrink-2 .doc-task-det { font-size: 9.5px; line-height: 1.35; }
+  .doc.print-shrink-2 .doc-task-dets { padding-left: 12px; }
+  .doc.print-shrink-2 .notice-cell { font-size: 10.5px; line-height: 1.45; padding: 4px 9px; }
+
+  /* 내용 극도로 많음 → 3단계 축소 */
+  .doc.print-shrink-3 .doc-title { font-size: 15px; margin-bottom: 4px; }
+  .doc.print-shrink-3 .doc-meta { font-size: 9px; margin-bottom: 4px; }
+  .doc.print-shrink-3 .doc-meta-org { font-size: 10px; letter-spacing: 2px; }
+  .doc.print-shrink-3 .doc-tbl { font-size: 9px; line-height: 1.3; }
+  .doc.print-shrink-3 .doc-tbl thead th { padding: 3px 2px; font-size: 9px; }
+  .doc.print-shrink-3 .cell-c { padding: 3px 7px; }
+  .doc.print-shrink-3 .cell-n { padding: 2px 3px; font-size: 8.5px; }
+  .doc.print-shrink-3 .cell-g { font-size: 9.5px; padding: 2px 1px; }
+  .doc.print-shrink-3 .doc-task { margin-bottom: 3px; }
+  .doc.print-shrink-3 .doc-task-ttl { font-size: 9px; }
+  .doc.print-shrink-3 .doc-task-det { font-size: 8.5px; line-height: 1.25; }
+  .doc.print-shrink-3 .doc-task-dets { padding-left: 10px; }
+  .doc.print-shrink-3 .notice-cell { font-size: 9px; line-height: 1.35; padding: 3px 7px; }
 }
 </style>
 </head>
@@ -312,7 +372,7 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
   <div class="ed-right">
     <div class="pv-hd">
       <div class="pv-hd-title">📄 실시간 미리보기</div>
-      <button class="ed-btn" onclick="window.print()">🖨 인쇄</button>
+      <button class="ed-btn" onclick="printDoc()">🖨 인쇄</button>
     </div>
     <div class="pv-body">
       <div class="doc" id="doc-out"></div>
@@ -358,6 +418,7 @@ G.saveTpl = saveTpl;
 G.loadTpl = loadTpl;
 G.delTpl = delTpl;
 G.livePreview = livePreview;
+G.printDoc = printDoc;
 
 // ── 미리 설정된 Firebase 설정값 (부서 공용) ──────────────────────
 const PRESET_CFG = {
@@ -868,6 +929,37 @@ function delTpl(id) {
   showToast('템플릿이 삭제됐습니다.');
 }
 
+// ── 인쇄: 내용 양에 따라 동적으로 폰트/여백 축소 ──────────────────
+function printDoc() {
+  const doc = document.getElementById('doc-out');
+  // 기존 축소 클래스 제거 (원래 크기로 측정)
+  doc.classList.remove('print-shrink-1','print-shrink-2','print-shrink-3');
+
+  // A4 본문 영역 기준 높이 계산 (mm → px, 96dpi 기준: 1mm ≈ 3.7795px)
+  // A4: 297mm, 여백 12mm*2 = 24mm → 본문 273mm ≈ 1032px
+  const PAGE_HEIGHT_PX = (297 - 24) * 3.7795;
+
+  // 강제 리플로우 후 실제 콘텐츠 높이 측정
+  const contentHeight = doc.scrollHeight;
+
+  let shrinkClass = '';
+  if (contentHeight > PAGE_HEIGHT_PX * 1.55) {
+    shrinkClass = 'print-shrink-3';
+  } else if (contentHeight > PAGE_HEIGHT_PX * 1.25) {
+    shrinkClass = 'print-shrink-2';
+  } else if (contentHeight > PAGE_HEIGHT_PX) {
+    shrinkClass = 'print-shrink-1';
+  }
+
+  if (shrinkClass) doc.classList.add(shrinkClass);
+
+  // 클래스 적용 후 한 프레임 기다렸다가 인쇄 (스타일 반영 시간 확보)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.print();
+    });
+  });
+}
 // ── helpers ───────────────────────────────────────────────────────
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
 function ea(s)  { return (s||'').replace(/"/g,'&quot;'); }
