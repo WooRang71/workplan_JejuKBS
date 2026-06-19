@@ -120,14 +120,14 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
 .task-inp:focus { border-bottom-color: var(--blue); }
 
 /* 비고 입력 */
-.task-note-inp { width: 80px; flex-shrink: 0; border: none; border-bottom: 1.5px solid #e0e0e0; background: transparent; font-family: inherit; font-size: 11px; color: #888; outline: none; padding: 5px 0; transition: border-color .15s; text-align: center; }
+.task-note-inp { width: 90px; flex-shrink: 0; border: none; border-bottom: 1.5px solid #e0e0e0; background: transparent; font-family: inherit; font-size: 11px; color: #888; outline: none; padding: 5px 0; transition: border-color .15s; text-align: center; resize: none; overflow: hidden; line-height: 1.4; min-height: 24px; }
 .task-note-inp:focus { border-bottom-color: var(--blue); }
 .task-note-inp::placeholder { color: #ccc; font-size: 10px; }
 
 .btn-del-task { background: none; border: none; color: #ccc; font-size: 13px; cursor: pointer; padding: 2px; margin-top: 4px; flex-shrink: 0; transition: color .15s; }
 .btn-del-task:hover { color: var(--red); }
 .dets { padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
-.det-row { display: flex; align-items: center; gap: 5px; }
+.det-row { display: flex; align-items: center; gap: 5px; width: 100%; }
 .det-dash { color: #888; font-size: 12px; flex-shrink: 0; }
 .det-inp { flex: 1; border: none; border-bottom: 1px dashed #ddd; background: transparent; font-family: inherit; font-size: 12px; color: #555; outline: none; padding: 3px 0; transition: border-color .15s; }
 .det-inp:focus { border-bottom-color: var(--blue); }
@@ -136,6 +136,20 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
 
 .btn-add-task { background: none; border: 1px dashed #ccc; width: 100%; padding: 7px; font-family: inherit; font-size: 12px; color: #999; cursor: pointer; border-radius: 3px; transition: all .15s; margin-top: 4px; }
 .btn-add-task:hover { border-color: var(--blue); color: var(--blue); }
+
+/* 하위그룹(○) 블록 */
+.grp-blk { padding-left: 18px; margin: 4px 0; border-left: 2px solid #e8e8e8; }
+.grp-hd { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.grp-o { color: var(--primary); font-size: 12px; flex-shrink: 0; }
+.grp-name-inp { flex: 1; border: none; border-bottom: 1px solid #e0e0e0; background: transparent; font-family: inherit; font-size: 12px; font-weight: 700; color: #333; outline: none; padding: 3px 0; transition: border-color .15s; }
+.grp-name-inp:focus { border-bottom-color: var(--blue); }
+.btn-del-grp { background: none; border: none; color: #ddd; font-size: 12px; cursor: pointer; padding: 2px; transition: color .15s; }
+.btn-del-grp:hover { color: var(--red); }
+.grp-items { padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
+.grp-item-inp { flex: 1; width: 100%; min-width: 0; border: none; border-bottom: 1px dashed #ddd; background: transparent; font-family: inherit; font-size: 12px; color: #555; outline: none; padding: 3px 0; transition: border-color .15s; }
+.grp-item-inp:focus { border-bottom-color: var(--blue); }
+.btn-add-grp { background: none; border: 1px dashed #d8d0c0; font-family: inherit; font-size: 11px; color: #aaa; cursor: pointer; padding: 4px 10px; border-radius: 3px; margin-top: 3px; transition: all .15s; align-self: flex-start; }
+.btn-add-grp:hover { border-color: var(--blue); color: var(--blue); }
 .btn-add-sec { background: none; border: 2px dashed #ccc; width: 100%; padding: 11px; font-family: inherit; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; border-radius: 4px; transition: all .18s; }
 .btn-add-sec:hover { border-color: var(--primary); color: var(--primary); }
 
@@ -170,6 +184,24 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
 .doc-task-det { color: #222; display: flex; gap: 4px; font-size: 13px; line-height: 1.7; }
 .doc-task-det::before { content: '-'; flex-shrink: 0; }
 .notice-cell { padding: 8px 12px; font-size: 13px; line-height: 1.8; color: #222; }
+
+/* ── 기술국 양식 ── */
+.tech-title { text-align: center; font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 900; letter-spacing: 6px; padding-bottom: 14px; margin-bottom: 6px; border-bottom: 2px solid #111; }
+.tech-date { text-align: right; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+.tech-tbl { width: 100%; border-collapse: collapse; border: 1.5px solid #111; font-size: 13px; line-height: 1.7; }
+.tech-tbl th, .tech-tbl td { border: 1px solid #333; vertical-align: top; padding: 0; }
+.tech-tbl thead th { text-align: center; font-weight: 700; padding: 7px 4px; background: #cfcfcf; letter-spacing: .2em; font-size: 13px; }
+.tech-col-g { width: 13%; }
+.tech-cell-g { text-align: center; font-weight: 700; font-size: 14px; padding: 6px 2px; background: #fafafa; display: flex; align-items: center; justify-content: center; word-break: keep-all; line-height: 1.6; white-space: pre-line; }
+.tech-cell-c { padding: 10px 16px; }
+.tech-l0 { font-weight: 700; display: flex; gap: 6px; align-items: flex-start; margin-bottom: 4px; font-size: 13px; }
+.tech-l1 { padding-left: 20px; display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 12.5px; color: #222; }
+.tech-l1::before { content: '○'; flex-shrink: 0; font-size: 10px; margin-top: 2px; }
+.tech-l2 { padding-left: 36px; display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 12px; color: #333; }
+.tech-l2::before { content: '-'; flex-shrink: 0; }
+.tech-task { margin-bottom: 10px; }
+.tech-task:last-child { margin-bottom: 0; }
+.tech-etc-cell { padding: 8px 16px; font-size: 13px; line-height: 1.8; color: #222; }
 
 .btn-tpl { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 7px 12px; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--primary2); cursor: pointer; transition: all .15s; }
 .btn-tpl:hover { border-color: var(--primary); color: var(--primary); background: #f0f4f8; }
@@ -214,6 +246,19 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
   .doc-task-dets { padding-left: 15px; }
   .notice-cell { font-size: 13px; line-height: 1.7; padding: 6px 12px; }
 
+  /* 기술국 양식 기본 */
+  .tech-title { font-size: 19px; padding-bottom: 10px; margin-bottom: 6px; }
+  .tech-date { font-size: 12px; margin-bottom: 6px; }
+  .tech-tbl { font-size: 12.5px; line-height: 1.6; }
+  .tech-tbl thead th { padding: 5px 4px; font-size: 12.5px; }
+  .tech-cell-c { padding: 8px 14px; }
+  .tech-cell-g { font-size: 13px; }
+  .tech-l0 { font-size: 12.5px; }
+  .tech-l1 { font-size: 12px; }
+  .tech-l2 { font-size: 11.5px; }
+  .tech-task { margin-bottom: 8px; }
+  .tech-etc-cell { font-size: 12.5px; padding: 6px 14px; }
+
   /* 내용 많음 → 1단계 축소 */
   .doc.print-shrink-1 .doc-title { font-size: 19px; margin-bottom: 6px; }
   .doc.print-shrink-1 .doc-meta { font-size: 11px; margin-bottom: 6px; }
@@ -227,6 +272,18 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
   .doc.print-shrink-1 .doc-task-ttl { font-size: 12px; }
   .doc.print-shrink-1 .doc-task-det { font-size: 11px; line-height: 1.5; }
   .doc.print-shrink-1 .notice-cell { font-size: 12px; line-height: 1.6; padding: 5px 11px; }
+
+  .doc.print-shrink-1 .tech-title { font-size: 17px; padding-bottom: 8px; margin-bottom: 5px; }
+  .doc.print-shrink-1 .tech-date { font-size: 11px; margin-bottom: 5px; }
+  .doc.print-shrink-1 .tech-tbl { font-size: 11.5px; line-height: 1.5; }
+  .doc.print-shrink-1 .tech-tbl thead th { padding: 4px 4px; font-size: 11.5px; }
+  .doc.print-shrink-1 .tech-cell-c { padding: 6px 12px; }
+  .doc.print-shrink-1 .tech-cell-g { font-size: 12px; }
+  .doc.print-shrink-1 .tech-l0 { font-size: 11.5px; }
+  .doc.print-shrink-1 .tech-l1 { font-size: 11px; }
+  .doc.print-shrink-1 .tech-l2 { font-size: 10.5px; }
+  .doc.print-shrink-1 .tech-task { margin-bottom: 6px; }
+  .doc.print-shrink-1 .tech-etc-cell { font-size: 11.5px; padding: 5px 12px; }
 
   /* 내용 매우 많음 → 2단계 축소 */
   .doc.print-shrink-2 .doc-title { font-size: 17px; margin-bottom: 5px; }
@@ -243,6 +300,18 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
   .doc.print-shrink-2 .doc-task-dets { padding-left: 12px; }
   .doc.print-shrink-2 .notice-cell { font-size: 10.5px; line-height: 1.45; padding: 4px 9px; }
 
+  .doc.print-shrink-2 .tech-title { font-size: 15px; padding-bottom: 6px; margin-bottom: 4px; }
+  .doc.print-shrink-2 .tech-date { font-size: 10px; margin-bottom: 4px; }
+  .doc.print-shrink-2 .tech-tbl { font-size: 10px; line-height: 1.35; }
+  .doc.print-shrink-2 .tech-tbl thead th { padding: 3px 3px; font-size: 10px; }
+  .doc.print-shrink-2 .tech-cell-c { padding: 5px 10px; }
+  .doc.print-shrink-2 .tech-cell-g { font-size: 10.5px; }
+  .doc.print-shrink-2 .tech-l0 { font-size: 10px; }
+  .doc.print-shrink-2 .tech-l1 { font-size: 9.5px; }
+  .doc.print-shrink-2 .tech-l2 { font-size: 9px; }
+  .doc.print-shrink-2 .tech-task { margin-bottom: 5px; }
+  .doc.print-shrink-2 .tech-etc-cell { font-size: 10px; padding: 4px 10px; }
+
   /* 내용 극도로 많음 → 3단계 축소 */
   .doc.print-shrink-3 .doc-title { font-size: 15px; margin-bottom: 4px; }
   .doc.print-shrink-3 .doc-meta { font-size: 9px; margin-bottom: 4px; }
@@ -257,6 +326,18 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
   .doc.print-shrink-3 .doc-task-det { font-size: 8.5px; line-height: 1.25; }
   .doc.print-shrink-3 .doc-task-dets { padding-left: 10px; }
   .doc.print-shrink-3 .notice-cell { font-size: 9px; line-height: 1.35; padding: 3px 7px; }
+
+  .doc.print-shrink-3 .tech-title { font-size: 13px; padding-bottom: 5px; margin-bottom: 3px; }
+  .doc.print-shrink-3 .tech-date { font-size: 9px; margin-bottom: 3px; }
+  .doc.print-shrink-3 .tech-tbl { font-size: 8.5px; line-height: 1.25; }
+  .doc.print-shrink-3 .tech-tbl thead th { padding: 2px 2px; font-size: 8.5px; }
+  .doc.print-shrink-3 .tech-cell-c { padding: 4px 8px; }
+  .doc.print-shrink-3 .tech-cell-g { font-size: 9px; }
+  .doc.print-shrink-3 .tech-l0 { font-size: 8.5px; }
+  .doc.print-shrink-3 .tech-l1 { font-size: 8px; }
+  .doc.print-shrink-3 .tech-l2 { font-size: 7.5px; }
+  .doc.print-shrink-3 .tech-task { margin-bottom: 4px; }
+  .doc.print-shrink-3 .tech-etc-cell { font-size: 8.5px; padding: 3px 8px; }
 }
 </style>
 </head>
@@ -340,7 +421,7 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
         <div class="fg"><label id="lbl-from">기간 시작</label><input type="date" id="f-from" oninput="livePreview()"></div>
         <div class="fg" id="fg-to"><label>기간 종료</label><input type="date" id="f-to" oninput="livePreview()"></div>
         <div class="fg full"><label>기관명</label>
-          <select id="f-org" onchange="livePreview()" style="border:1px solid var(--border);border-radius:4px;padding:8px 10px;font-family:inherit;font-size:13px;color:var(--ink, #1c1c1e);outline:none;background:#faf8f4;cursor:pointer;">
+          <select id="f-org" onchange="onOrgChange()" style="border:1px solid var(--border);border-radius:4px;padding:8px 10px;font-family:inherit;font-size:13px;color:var(--ink, #1c1c1e);outline:none;background:#faf8f4;cursor:pointer;">
             <option value="총 무 국">총무국</option>
             <option value="보 도 국">보도국</option>
             <option value="편 제 국">편제국</option>
@@ -419,6 +500,12 @@ G.loadTpl = loadTpl;
 G.delTpl = delTpl;
 G.livePreview = livePreview;
 G.printDoc = printDoc;
+G.onOrgChange = onOrgChange;
+G.addGroup = addGroup;
+G.addGroupItem = addGroupItem;
+G.handleGroupItemEnter = handleGroupItemEnter;
+G.toggleMark = toggleMark;
+G.autoResize = autoResize;
 
 // ── 미리 설정된 Firebase 설정값 (부서 공용) ──────────────────────
 const PRESET_CFG = {
@@ -530,6 +617,37 @@ function renderList() {
 }
 
 // ── new / open ────────────────────────────────────────────────────
+function onOrgChange() {
+  const org = gv('f-org');
+  const secInputs = [...document.querySelectorAll('#sw .sec-name')];
+  const names = secInputs.map(i => i.value.trim());
+
+  const generalDefaults = ['총무', '재원관리'];
+  const techDefaults = ['기술관리 R', '제작기술 TV', '송출기술'];
+
+  const isCurrentlyGeneral = names.every(n => generalDefaults.includes(n)) && names.length > 0;
+  const isCurrentlyTech = names.every(n => techDefaults.includes(n)) && names.length > 0;
+
+  // 기술국으로 변경 + 현재 기본(총무/재원관리) 구분만 있고 내용 없음 → 기술국 기본 구분으로 교체
+  if (org === '기 술 국' && isCurrentlyGeneral) {
+    const hasContent = [...document.querySelectorAll('#sw .task-inp')].some(i => i.value.trim());
+    if (!hasContent) {
+      document.getElementById('sw').innerHTML = '';
+      techDefaults.forEach(n => addSec(n));
+    }
+  }
+  // 기술국 → 다른 부서로 변경 + 현재 기술국 기본 구분만 있고 내용 없음 → 총무/재원관리로 교체
+  else if (org !== '기 술 국' && isCurrentlyTech) {
+    const hasContent = [...document.querySelectorAll('#sw .task-inp')].some(i => i.value.trim());
+    if (!hasContent) {
+      document.getElementById('sw').innerHTML = '';
+      generalDefaults.forEach(n => addSec(n));
+    }
+  }
+
+  livePreview();
+}
+
 function newDoc() {
   curId = null; sc = 0; tc = 0;
   sv('edit-id',''); sv('ed-heading','새 업무계획 작성');
@@ -550,7 +668,7 @@ function openDoc(id) {
   document.getElementById('sw').innerHTML = '';
   (d.sections||[]).forEach(s => {
     const idx = addSec(s.name);
-    (s.tasks||[]).forEach(t => addTask(idx, t.title, t.note||'', t.details||[]));
+    (s.tasks||[]).forEach(t => addTask(idx, t.title, t.note||'', t.details||[], t.groups||[], t.mark||'□'));
   });
   showViewRaw('edit'); livePreview();
 }
@@ -587,27 +705,35 @@ function addSec(name = '') {
 }
 
 // ── task ──────────────────────────────────────────────────────────
-function addTask(si, title = '', note = '', details = []) {
+function addTask(si, title = '', note = '', details = [], groups = [], mark = '□') {
   const list = document.getElementById('tl-'+si); if (!list) return;
   const tid = tc++;
   const blk = document.createElement('div');
   blk.className = 'task-blk';
   blk.draggable = true;
   const dHtml = details.length ? details.map(d => dRow(d, tid)).join('') : dRow('', tid);
+  const mark0 = mark || '□';
+  blk.dataset.mark = mark0;
   blk.innerHTML = `
     <div class="task-row">
       <input type="checkbox" class="task-chk" title="템플릿 저장 시 선택" style="flex-shrink:0;width:15px;height:15px;cursor:pointer;accent-color:var(--primary);margin-top:6px;">
       <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
       <div class="task-o">○</div>
+      <button class="mark-toggle" title="기호 전환 (□ / ※)" onclick="toggleMark(this)" style="flex-shrink:0;width:24px;height:24px;border:1px solid var(--border);border-radius:4px;background:#fdfcf9;cursor:pointer;font-size:13px;font-weight:700;color:var(--primary2);margin-top:3px;transition:all .15s;">${mark0}</button>
       <input class="task-inp" type="text" placeholder="업무 제목" value="${ea(title)}"
         onkeydown="handleTitleEnter(event,${tid})" oninput="livePreview()">
-      <input class="task-note-inp" type="text" placeholder="비고" value="${ea(note)}" oninput="livePreview()">
+      <textarea class="task-note-inp" placeholder="비고" rows="1" oninput="autoResize(this);livePreview()">${ea(note)}</textarea>
       <button class="btn-del-task" onclick="this.closest('.task-blk').remove();livePreview()">✕</button>
     </div>
-    <div class="dets" id="dl-${tid}">${dHtml}</div>`;
+    <div class="dets" id="dl-${tid}">${dHtml}</div>
+    <div class="grps" id="gl-${tid}"></div>
+    <button class="btn-add-grp" onclick="addGroup(${tid})">○ 하위그룹 항목 추가</button>`;
 
   addDragEvents(blk);
   list.appendChild(blk);
+
+  // 기존 그룹 데이터 렌더링 (불러오기 시)
+  (groups||[]).forEach(g => addGroup(tid, g.group, g.items));
 }
 
 function addDragEvents(blk) {
@@ -681,6 +807,64 @@ function handleDetailEnter(e, tid) {
   }
 }
 
+// ── 기술국 업무 기호(□/※) 전환 ──────────────────────────────────
+function toggleMark(btn) {
+  const blk = btn.closest('.task-blk');
+  const cur = blk.dataset.mark || '□';
+  const next = cur === '□' ? '※' : '□';
+  blk.dataset.mark = next;
+  btn.textContent = next;
+  livePreview();
+}
+let gc = 0;
+function addGroup(tid, groupName = '', items = []) {
+  const list = document.getElementById('gl-'+tid); if (!list) return;
+  const gid = gc++;
+  const block = document.createElement('div');
+  block.className = 'grp-blk';
+  const itemsHtml = (items.length ? items : ['']).map(v => gItemRow(v, gid)).join('');
+  block.innerHTML = `
+    <div class="grp-hd">
+      <span class="grp-o">○</span>
+      <input class="grp-name-inp" type="text" placeholder="그룹명 (예: 생방송, 송출...)" value="${ea(groupName)}" oninput="livePreview()">
+      <button class="btn-del-grp" onclick="this.closest('.grp-blk').remove();livePreview()">✕</button>
+    </div>
+    <div class="grp-items" id="gi-${gid}">${itemsHtml}</div>`;
+  list.appendChild(block);
+}
+function gItemRow(val, gid) {
+  return `<div class="det-row">
+    <span class="det-dash">-</span>
+    <input class="grp-item-inp" type="text" placeholder="세부 내용 (Enter로 줄 추가)" value="${ea(val)}"
+      onkeydown="handleGroupItemEnter(event,${gid})" oninput="livePreview()">
+    <button class="btn-del-det" onclick="this.closest('.det-row').remove();livePreview()">✕</button>
+  </div>`;
+}
+function addGroupItem(gid) {
+  const list = document.getElementById('gi-'+gid); if (!list) return;
+  const tmp = document.createElement('div'); tmp.innerHTML = gItemRow('', gid);
+  list.appendChild(tmp.firstElementChild);
+  list.lastElementChild.querySelector('input').focus();
+}
+function handleGroupItemEnter(e, gid) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const list = document.getElementById('gi-'+gid);
+    const inputs = [...list.querySelectorAll('.grp-item-inp')];
+    const i = inputs.indexOf(e.target);
+    if (i === inputs.length - 1) addGroupItem(gid); else inputs[i+1].focus();
+  }
+  if (e.key === 'Backspace' && !e.target.value) {
+    e.preventDefault();
+    const list = document.getElementById('gi-'+gid);
+    const inputs = [...list.querySelectorAll('.grp-item-inp')];
+    if (inputs.length <= 1) return;
+    const i = inputs.indexOf(e.target);
+    const focus = inputs[i-1] || inputs[i+1];
+    e.target.closest('.det-row').remove();
+    if (focus) focus.focus();
+  }
+}
 // ── read form ─────────────────────────────────────────────────────
 function readForm() {
   const sections = [];
@@ -690,8 +874,13 @@ function readForm() {
     sb.querySelectorAll('.task-blk').forEach(tb => {
       const title   = tb.querySelector('.task-inp').value.trim();
       const note    = tb.querySelector('.task-note-inp').value.trim();
-      const details = [...tb.querySelectorAll('.det-inp')].map(i => i.value.trim()).filter(Boolean);
-      if (title) tasks.push({title, note, details});
+      const details = [...tb.querySelectorAll('.dets .det-inp')].map(i => i.value.trim()).filter(Boolean);
+      const groups  = [...tb.querySelectorAll('.grp-blk')].map(g => {
+        const gname = g.querySelector('.grp-name-inp').value.trim();
+        const items = [...g.querySelectorAll('.grp-item-inp')].map(i => i.value.trim()).filter(Boolean);
+        return {group: gname, items};
+      }).filter(g => g.group || g.items.length);
+      if (title) tasks.push({title, note, details, groups, mark: tb.dataset.mark || '□'});
     });
     if (name || tasks.length) sections.push({name, tasks});
   });
@@ -703,10 +892,80 @@ function readForm() {
   };
 }
 
+// ── 기술국 양식 렌더링 ────────────────────────────────────────────
+function renderTechPreview(data, isWeekly) {
+  const from = data.dateFrom ? data.dateFrom.replace(/-/g,'.') : '';
+  const to   = data.dateTo   ? data.dateTo.replace(/-/g,'.')   : '';
+
+  let dateStr = '';
+  if (isWeekly) {
+    dateStr = from && to ? `${from} ~ ${to}` : from || '';
+  } else if (from) {
+    const d = new Date(data.dateFrom);
+    const days = ['일','월','화','수','목','금','토'];
+    dateStr = `${from}.(${days[d.getDay()]})`;
+  }
+
+  const titleText = isWeekly ? '기술국 주간업무 보고' : '기술국 일일업무 보고';
+
+  let rows = '';
+  data.sections.forEach(sec => {
+    const n = sec.tasks.length;
+    let taskHtml = '';
+    if (!n) {
+      taskHtml = '';
+    } else {
+      taskHtml = sec.tasks.map(t => {
+        const detHtml = (t.details||[]).map(d => `<div class="tech-l1">${esc(d)}</div>`).join('');
+        const grpHtml = (t.groups||[]).map(g => {
+          const itemsHtml = (g.items||[]).map(it => `<div class="tech-l2">${esc(it)}</div>`).join('');
+          return `<div class="tech-l1">${esc(g.group)}</div>${itemsHtml}`;
+        }).join('');
+        return `<div class="tech-task">
+          <div class="tech-l0"><span>${esc(t.mark || '□')}</span><span>${esc(t.title)}</span></div>
+          ${detHtml}
+          ${grpHtml}
+        </div>`;
+      }).join('');
+    }
+    rows += `<tr>
+      <td class="tech-col-g"><div class="tech-cell-g">${esc(sec.name)}</div></td>
+      <td class="tech-cell-c">${taskHtml}</td>
+    </tr>`;
+  });
+
+  // 기타 row — 항상 표시
+  const etcRow = `<tr>
+    <td class="tech-col-g"><div class="tech-cell-g">기 타</div></td>
+    <td class="tech-etc-cell">${esc(data.notice)}</td>
+  </tr>`;
+
+  document.getElementById('doc-out').innerHTML = `
+    <div class="tech-title">${esc(titleText)}</div>
+    <div class="tech-date">${esc(dateStr)}</div>
+    <table class="tech-tbl">
+      <colgroup><col class="tech-col-g"><col></colgroup>
+      <thead>
+        <tr>
+          <th class="tech-col-g">구 분</th>
+          <th>주 요 내 용</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows || '<tr><td colspan="2" style="padding:20px;text-align:center;color:#aaa;font-size:12px;">업무 항목을 입력하면 여기에 표시됩니다</td></tr>'}
+        ${etcRow}
+      </tbody>
+    </table>`;
+}
+
 // ── live preview ──────────────────────────────────────────────────
 function livePreview() {
   const data = readForm();
   const isWeekly = data.docTitle === '주간업무계획(보고)';
+  const isTech = data.org === '기 술 국';
+
+  if (isTech) { renderTechPreview(data, isWeekly); return; }
+
   const from = data.dateFrom ? data.dateFrom.replace(/-/g,'.') : '';
   const to   = data.dateTo   ? data.dateTo.replace(/-/g,'.')   : '';
   const period = isWeekly
@@ -894,23 +1153,29 @@ function loadTpl(id) {
         const blk = document.createElement('div');
         blk.className = 'task-blk';
         blk.draggable = true;
+        const mark0 = t.mark || '□';
+        blk.dataset.mark = mark0;
         blk.innerHTML = `
           <div class="task-row">
             <input type="checkbox" class="task-chk" style="flex-shrink:0;width:15px;height:15px;cursor:pointer;accent-color:var(--primary);margin-top:6px;">
             <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
             <div class="task-o">○</div>
+            <button class="mark-toggle" title="기호 전환 (□ / ※)" onclick="toggleMark(this)" style="flex-shrink:0;width:24px;height:24px;border:1px solid var(--border);border-radius:4px;background:#fdfcf9;cursor:pointer;font-size:13px;font-weight:700;color:var(--primary2);margin-top:3px;transition:all .15s;">${mark0}</button>
             <input class="task-inp" type="text" value="${ea(t.title)}" onkeydown="handleTitleEnter(event,${tid})" oninput="livePreview()">
-            <input class="task-note-inp" type="text" placeholder="비고" value="${ea(t.note||'')}" oninput="livePreview()">
+            <textarea class="task-note-inp" placeholder="비고" rows="1" oninput="autoResize(this);livePreview()">${ea(t.note||'')}</textarea>
             <button class="btn-del-task" onclick="this.closest('.task-blk').remove();livePreview()">✕</button>
           </div>
-          <div class="dets" id="dl-${tid}">${dHtml}</div>`;
+          <div class="dets" id="dl-${tid}">${dHtml}</div>
+          <div class="grps" id="gl-${tid}"></div>
+          <button class="btn-add-grp" onclick="addGroup(${tid})">○ 하위그룹 항목 추가</button>`;
         addDragEvents(blk);
         tasksBody.prepend(blk); // 맨 위에 추가
+        (t.groups||[]).forEach(g => addGroup(tid, g.group, g.items));
       });
     } else {
       // 없는 구분이면 새로 만들어서 추가
       const idx = addSec(s.name);
-      s.tasks.forEach(t => addTask(idx, t.title, t.note||'', t.details||[]));
+      s.tasks.forEach(t => addTask(idx, t.title, t.note||'', t.details||[], t.groups||[], t.mark||'□'));
     }
   });
 
@@ -961,6 +1226,10 @@ function printDoc() {
   });
 }
 // ── helpers ───────────────────────────────────────────────────────
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
 function ea(s)  { return (s||'').replace(/"/g,'&quot;'); }
 function gv(id) { return (document.getElementById(id)||{}).value || ''; }
