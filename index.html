@@ -479,7 +479,7 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
 
 <script type="module">
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy }
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const COL = 'workplans';
@@ -534,7 +534,7 @@ async function tryConnect(cfg) {
     const app = getApps().length ? getApps()[0] : initializeApp(cfg);
     db = getFirestore(app);
     await getDocs(query(collection(db, COL)));
-    setOnline(true); showViewRaw('list'); await loadDocs(); return true;
+    setOnline(true); showViewRaw('list'); loadDocs(); return true;
   } catch(e) {
     console.error('Firebase 연결 오류:', e);
     return false;
@@ -559,7 +559,7 @@ async function connectFirebase() {
     setOnline(true);
     showToast('Firebase 연결 성공! 🎉');
     showViewRaw('list');
-    await loadDocs();
+    loadDocs();
   } catch(e) {
     console.error('연결 오류 상세:', e);
     const msg = e.code === 'permission-denied'
@@ -585,18 +585,32 @@ function showViewRaw(name) {
 }
 async function showView(name) {
   showViewRaw(name);
-  if (name === 'list') await loadDocs();
+  if (name === 'list') loadDocs();
 }
 
 // ── list ──────────────────────────────────────────────────────────
-async function loadDocs() {
+// ── 실시간 데이터 동기화 ──────────────────────────────────────────
+let unsubscribe = null; // 이전 리스너 해제용
+
+function loadDocs() {
   const tbody = document.getElementById('list-tbody');
   tbody.innerHTML = '<tr class="ctr"><td colspan="6">⏳ 불러오는 중...</td></tr>';
-  try {
-    const snap = await getDocs(query(collection(db, COL), orderBy('createdAt','desc')));
-    allDocs = snap.docs.map(d => ({id: d.id, ...d.data()}));
-    renderList();
-  } catch(e) { tbody.innerHTML = `<tr class="ctr"><td colspan="6">오류: ${e.message}</td></tr>`; }
+
+  // 기존 리스너가 있으면 해제
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+
+  const q = query(collection(db, COL), orderBy('createdAt', 'desc'));
+
+  unsubscribe = onSnapshot(q,
+    snap => {
+      allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderList();
+      // 목록 화면이 아닐 때도 데이터는 최신 상태 유지
+    },
+    err => {
+      tbody.innerHTML = `<tr class="ctr"><td colspan="6">오류: ${err.message}</td></tr>`;
+    }
+  );
 }
 function renderList() {
   const tbody = document.getElementById('list-tbody');
@@ -1055,7 +1069,7 @@ async function saveDoc() {
 // ── delete ────────────────────────────────────────────────────────
 async function delDoc(id) {
   if (!confirm('삭제하시겠습니까?')) return;
-  try { await deleteDoc(doc(db, COL, id)); showToast('삭제되었습니다.'); await loadDocs(); }
+  try { await deleteDoc(doc(db, COL, id)); showToast('삭제되었습니다.'); }
   catch(e) { showToast('삭제 실패: ' + e.message); }
 }
 
