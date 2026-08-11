@@ -352,6 +352,8 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
     <button class="ab-btn" id="nav-list" style="display:none" onclick="showView('list')">목록</button>
     <button class="ab-btn prim" id="nav-new" style="display:none" onclick="newDoc()">＋ 새 문서</button>
     <button class="ab-btn" id="nav-cfg" style="display:none" onclick="showView('setup')">⚙ 설정</button>
+    <span id="nav-user" style="display:none;font-size:12px;color:rgba(255,255,255,0.7);margin-left:4px;"></span>
+    <button class="ab-btn" id="nav-logout" style="display:none;border-color:rgba(255,255,255,0.3);" onclick="logoutUser()">로그아웃</button>
   </div>
 </div>
 
@@ -375,6 +377,44 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
       </div>
       <button class="btn-conn" id="btn-conn" onclick="connectFirebase()">🔗 Firebase 연결하기</button>
       <div class="err-msg" id="err-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div class="view" id="view-login">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 50px);padding:24px;">
+    <div style="background:white;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,0.1);padding:40px 44px;max-width:400px;width:100%;">
+      <div style="text-align:center;margin-bottom:28px;">
+        <div style="font-size:32px;margin-bottom:10px;">📋</div>
+        <div style="font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;color:var(--primary);margin-bottom:4px;">업무계획(보고) 시스템</div>
+        <div style="font-size:13px;color:#888;">로그인 후 이용하실 수 있습니다</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888;">이메일</label>
+          <input type="email" id="login-email" placeholder="이메일 주소 입력"
+            style="border:1px solid var(--border);border-radius:4px;padding:10px 12px;font-family:inherit;font-size:14px;outline:none;transition:border-color .15s;"
+            onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor=''"
+            onkeydown="if(event.key==='Enter')document.getElementById('login-pw').focus()">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888;">비밀번호</label>
+          <input type="password" id="login-pw" placeholder="비밀번호 입력"
+            style="border:1px solid var(--border);border-radius:4px;padding:10px 12px;font-family:inherit;font-size:14px;outline:none;transition:border-color .15s;"
+            onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor=''"
+            onkeydown="if(event.key==='Enter')loginSubmit()">
+        </div>
+      </div>
+      <button onclick="loginSubmit()" id="login-btn"
+        style="width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:4px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:background .18s;letter-spacing:.04em;"
+        onmouseover="this.style.background='var(--primary2)'" onmouseout="this.style.background='var(--primary)'">
+        로그인
+      </button>
+      <div id="login-err" style="color:#e74c3c;font-size:12px;margin-top:10px;text-align:center;display:none;"></div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #eee;font-size:12px;color:#aaa;text-align:center;line-height:1.7;">
+        계정이 없으신가요?<br>관리자에게 계정 생성을 요청하세요.
+      </div>
     </div>
   </div>
 </div>
@@ -481,12 +521,16 @@ body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: var
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const COL = 'workplans';
-let db = null, allDocs = [], curId = null, sc = 0, tc = 0;
+let db = null, auth = null, allDocs = [], curId = null, sc = 0, tc = 0;
 
 const G = window;
 G.connectFirebase = connectFirebase;
+G.loginSubmit = loginSubmit;
+G.logoutUser = logoutUser;
 G.showView = showView;
 G.newDoc = newDoc; G.openDoc = openDoc;
 G.saveDoc = saveDoc; G.delDoc = delDoc;
@@ -532,9 +576,30 @@ function fillCfg(c) {
 async function tryConnect(cfg) {
   try {
     const app = getApps().length ? getApps()[0] : initializeApp(cfg);
-    db = getFirestore(app);
-    await getDocs(query(collection(db, COL)));
-    setOnline(true); showViewRaw('list'); loadDocs(); return true;
+    db   = getFirestore(app);
+    auth = getAuth(app);
+
+    // 연결 테스트 (인증 없이 읽기 시도 — Firestore 규칙이 auth 필요하면 여기서 실패)
+    // 대신 auth 상태 변화로 흐름 제어
+    setOnline(true);
+
+    // 인증 상태 감지
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        // 로그인됨
+        document.getElementById('nav-user').textContent = user.email;
+        document.getElementById('nav-user').style.display = '';
+        document.getElementById('nav-logout').style.display = '';
+        showViewRaw('list');
+        loadDocs();
+      } else {
+        // 로그아웃됨
+        document.getElementById('nav-user').style.display = 'none';
+        document.getElementById('nav-logout').style.display = 'none';
+        showViewRaw('login');
+      }
+    });
+    return true;
   } catch(e) {
     console.error('Firebase 연결 오류:', e);
     return false;
@@ -554,12 +619,11 @@ async function connectFirebase() {
   try {
     const app = getApps().length ? getApps()[0] : initializeApp(cfg);
     db = getFirestore(app);
-    await getDocs(query(collection(db, COL)));
+    auth = getAuth(app);
     localStorage.setItem('fb_cfg', JSON.stringify(cfg));
     setOnline(true);
     showToast('Firebase 연결 성공! 🎉');
-    showViewRaw('list');
-    loadDocs();
+    // onAuthStateChanged 가 자동으로 로그인 화면으로 이동
   } catch(e) {
     console.error('연결 오류 상세:', e);
     const msg = e.code === 'permission-denied'
@@ -572,6 +636,40 @@ async function connectFirebase() {
     btn.disabled = false;
   }
 }
+// ── 로그인 / 로그아웃 ─────────────────────────────────────────────
+async function loginSubmit() {
+  const email = (document.getElementById('login-email').value || '').trim();
+  const pw    = document.getElementById('login-pw').value || '';
+  const err   = document.getElementById('login-err');
+  const btn   = document.getElementById('login-btn');
+  err.style.display = 'none';
+  if (!email || !pw) { showLoginErr('이메일과 비밀번호를 입력해 주세요.'); return; }
+  btn.textContent = '로그인 중...'; btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, pw);
+    // onAuthStateChanged 가 자동으로 화면 전환 처리
+  } catch(e) {
+    const msg = e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found'
+      ? '이메일 또는 비밀번호가 올바르지 않습니다.'
+      : e.code === 'auth/too-many-requests'
+      ? '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.'
+      : '로그인 실패: ' + e.message;
+    showLoginErr(msg);
+  }
+  btn.textContent = '로그인'; btn.disabled = false;
+}
+
+function showLoginErr(msg) {
+  const err = document.getElementById('login-err');
+  err.textContent = msg; err.style.display = 'block';
+}
+
+async function logoutUser() {
+  if (!confirm('로그아웃 하시겠습니까?')) return;
+  await signOut(auth);
+  showToast('로그아웃 되었습니다.');
+}
+
 function setOnline(on) {
   document.getElementById('db-dot').className = 'db-dot'+(on?' on':'');
   document.getElementById('db-label').textContent = on ? '연결됨' : '미연결';
